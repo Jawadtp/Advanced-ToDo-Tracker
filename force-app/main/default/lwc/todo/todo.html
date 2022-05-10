@@ -2,42 +2,22 @@
     <lightning-card  title="ToDo List">
         <lightning-button-icon icon-name="utility:sync"  slot="actions" alternative-text="Settings" title="Settings"></lightning-button-icon>
             <ul class="slds-has-dividers_around-space">
-                    
-                <li class="slds-item slds-m-around_small">
-                    <lightning-layout horizontal-align="spread" vertical-align="center">
-                        <lightning-layout-item>
-                            <div class="taskText">Wash the car Wash the car Wash the car Wash the car Wash the car</div>
-                        </lightning-layout-item>
-                        <lightning-layout-item>
-                            <lightning-button-icon class="slds-m-left_small" icon-name="utility:delete"  alternative-text="Settings" title="Settings"></lightning-button-icon>
-                        </lightning-layout-item>
-                        
-                       
-                    </lightning-layout>
-                </li>
-                
-                <li class="slds-item slds-m-around_small">
-                    <lightning-layout horizontal-align="spread" vertical-align="center">
-                        <lightning-layout-item>
-                            <div class="taskText">Wash the car twice and again</div>
-                        </lightning-layout-item>
-                        <lightning-layout-item>
-                            <lightning-button-icon class="slds-m-left_small" icon-name="utility:delete"  alternative-text="Settings" title="Settings"></lightning-button-icon>
-                        </lightning-layout-item>
-                        
-                       
-                    </lightning-layout>
-                </li>
+                <template for:each={toDoTasks} for:item="task">
+                    <li key={task.id} class="slds-item slds-m-around_small">
+                        <c-todo-task ondeletetask={deleteTask} task-name={task.name} task-id={task.id}></c-todo-task>
+                    </li>
+                </template>
+               
    
                 </ul>
 
                 <p slot="footer">
                     <lightning-layout horizontal-align="spread" vertical-align="center">
                         <lightning-layout-item flexibility="grow">
-                            <lightning-input type="text" label="Enter a new task" placeholder="Enter a new task" variant="label-hidden"></lightning-input>
+                            <lightning-input class="taskInput" type="text" onchange={onTaskTextChange} value={newTask} label="Enter a new task" placeholder="Enter a new task" variant="label-hidden"></lightning-input>
                         </lightning-layout-item>
                         <lightning-layout-item>
-                            <lightning-button variant="brand" label="Add" title="Primary action" onclick={handleClick} class="slds-m-left_x-small"></lightning-button>
+                            <lightning-button variant="brand" label="Add" title="Primary action" onclick={handleAddTask} class="slds-m-left_x-small"></lightning-button>
                         </lightning-layout-item>
                         
                        
