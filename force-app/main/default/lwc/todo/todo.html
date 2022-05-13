@@ -1,5 +1,11 @@
 <template>
+    
+
     <lightning-card  title="ToDo List">
+        <template if:true={loading} >
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+
         <lightning-button-icon onclick={refreshTodoList} icon-name="utility:sync"  slot="actions" alternative-text="Settings" title="Settings"></lightning-button-icon>
             <ul class="slds-has-dividers_around-space">
                 <template for:each={toDoTasks} for:item="task">
@@ -7,21 +13,20 @@
                         <c-todo-task ondeletetask={deleteTask} task-name={task.Subject} task-id={task.Id} record-id={task.recordId}></c-todo-task>
                     </li>
                 </template>
-   
-                </ul>
 
-                <p slot="footer">
-                    <lightning-layout horizontal-align="spread" vertical-align="center">
-                        <lightning-layout-item flexibility="grow">
-                            <lightning-input class="taskInput" type="text" onchange={onTaskTextChange} value={newTask} label="Enter a new task" placeholder="Enter a new task" variant="label-hidden"></lightning-input>
-                        </lightning-layout-item>
-                        <lightning-layout-item>
-                            <lightning-button variant="brand" label="Add" title="Primary action" onclick={handleAddTask} class="slds-m-left_x-small"></lightning-button>
-                        </lightning-layout-item>
-                        
-                       
-                    </lightning-layout>
-                </p>
+            </ul>
+
+            <p slot="footer">
+                <lightning-layout horizontal-align="spread" vertical-align="center">
+                    <lightning-layout-item flexibility="grow">
+                        <lightning-input class="taskInput" type="text" onchange={onTaskTextChange} value={newTask} label="Enter a new task" placeholder="Enter a new task" variant="label-hidden"></lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item>
+                        <lightning-button variant="brand" label="Add" title="Primary action" onclick={handleAddTask} class="slds-m-left_x-small"></lightning-button>
+                    </lightning-layout-item>
+                    
                 
-    </lightning-card>
+                </lightning-layout>
+            </p>
+            </lightning-card>
 </template>

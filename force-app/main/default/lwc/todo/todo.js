@@ -7,6 +7,8 @@ import deleteTaskFromDatabase from "@salesforce/apex/ToDoListController.deleteTa
 export default class Todo extends LightningElement 
 {
 
+    loading=false
+
     connectedCallback()
     {
 
@@ -25,6 +27,8 @@ export default class Todo extends LightningElement
 
      fetchTasksAndPopulate()
      {
+         this.loading=true
+
         fetchAllTasks().then(result=>{
             console.log("Fetched data: "+JSON.stringify(result))
             result.forEach(task => 
@@ -37,11 +41,16 @@ export default class Todo extends LightningElement
                  });
         }).catch(error=>{
             console.error("Error: ",error)
+        }).finally(()=>
+        {
+            this.loading=false
         })
      }
 
      handleAddTask()
      {
+         this.loading=true
+
         insertTask({subject:this.newTask}).then((result)=>{
             if(result)
             {
@@ -52,32 +61,31 @@ export default class Todo extends LightningElement
             else console.log("Task insertion failed")
         }).catch((error)=>{
            
+        }).finally(()=>
+        {
+            this.loading=false
         })
-      
+        
 
     }
 
     async deleteTask(event)
     {
+        this.loading=true
+
         console.log(event.detail)
 
         const res = await deleteTaskFromDatabase({id: event.detail})
+       
         if(res)
         {
             this.toDoTasks=this.toDoTasks.filter(todo=>todo.recordId!==event.detail)
 
         }
         else console.error("Deletion failed")
-    /*   deleteTaskFromDatabase({id: event.detail}).then((result)=>
-        {
-            console.log("Delete result", result)
-       //     console.log("ToDo array after deletion: "+JSON.stringify(this.toDoTasks))
 
-        }).error((error)=>{
-            console.error(error)
-        })
-        */
-
+        this.loading=false
+  
     }
      onTaskTextChange(event)
      {
