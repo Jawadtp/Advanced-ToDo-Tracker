@@ -1,43 +1,96 @@
-import NumberOfFailedLogins from '@salesforce/schema/User.NumberOfFailedLogins';
 import { LightningElement, track } from 'lwc';
+import fetchAllTasks from "@salesforce/apex/ToDoListController.fetchAllTasks";
+import insertTask from "@salesforce/apex/ToDoListController.insertTask";
+import deleteTaskFromDatabase from "@salesforce/apex/ToDoListController.deleteTask";
+
 
 export default class Todo extends LightningElement 
 {
+
+    connectedCallback()
+    {
+
+        this.fetchTasksAndPopulate()
+    }
      newTask=''
-    test='hello'
+    
      @track
-     toDoTasks = [
-         {
-            id: 0,
-            name: "Task 1",
-         },
-         {
-            id: 1,
-            name: "Task 2",
-         },
-         {
-            id: 2,
-            name: "Task 3",
-         },
-         {
-            id: 3,
-            name: "Task 4",
-         },
-     ]
+     toDoTasks=[]
+    
+
+     resetTasks()
+     {
+         this.toDoTasks=[]
+     }
+
+     fetchTasksAndPopulate()
+     {
+        fetchAllTasks().then(result=>{
+            console.log("Fetched data: "+JSON.stringify(result))
+            result.forEach(task => 
+                {
+                     this.toDoTasks.push({
+                         id: this.toDoTasks.length,
+                         Subject: task.Subject,
+                         recordId: task.Id
+                        })
+                 });
+        }).catch(error=>{
+            console.error("Error: ",error)
+        })
+     }
+
      handleAddTask()
      {
-        this.toDoTasks.push({id: this.toDoTasks.length, name: this.newTask})
-        this.template.querySelector('.taskInput').value=null
+        insertTask({subject:this.newTask}).then((result)=>{
+            if(result)
+            {
+                console.log("Task insertion has been successful")
+                this.toDoTasks.push({id: this.toDoTasks.length, Subject: result.Subject, recordId: result.Id})
+                this.template.querySelector('.taskInput').value=null
+            }
+            else console.log("Task insertion failed")
+        }).catch((error)=>{
+           
+        })
+      
+
     }
 
-
-    deleteTask(event)
+    async deleteTask(event)
     {
-        //Note: filter creates a second array. Splice modifies the exisiting array, and is hence faster and more memory efficient.
-        this.toDoTasks=this.toDoTasks.filter(todo=>todo.id!==event.detail)
+        console.log(event.detail)
+
+        const res = await deleteTaskFromDatabase({id: event.detail})
+        if(res)
+        {
+            this.toDoTasks=this.toDoTasks.filter(todo=>todo.recordId!==event.detail)
+
+        }
+        else console.error("Deletion failed")
+    /*   deleteTaskFromDatabase({id: event.detail}).then((result)=>
+        {
+            console.log("Delete result", result)
+       //     console.log("ToDo array after deletion: "+JSON.stringify(this.toDoTasks))
+
+        }).error((error)=>{
+            console.error(error)
+        })
+        */
+
     }
      onTaskTextChange(event)
      {
          this.newTask=event.target.value
      }
+
+     refreshTodoList()
+     {
+         this.resetTasks()
+         this.fetchTasksAndPopulate()
+         
+     }
+
+     
+     
 }
